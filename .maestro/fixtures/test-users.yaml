@@ -1,0 +1,16 @@
+# Shared test-user fixtures referenced by individual flows.
+#
+# IMPORTANT: do not commit real production credentials here. Test
+# users below should exist on chat-qa.ethora.com only — created via
+# `@ethora/setup` against a QA app, with throwaway passwords.
+#
+# CI overrides these via repository secrets (MAESTRO_TEST_EMAIL /
+# MAESTRO_TEST_PASSWORD) so the live values never live in source.
+#
+# Mirrors `ethora-sample-android/.maestro/fixtures/test-users.yaml`.
+
+ALICE_EMAIL: alice@ethora.com
+ALICE_PASSWORD: TestPass123
+
+BOB_EMAIL: bob@ethora.com
+BOB_PASSWORD: TestPass123

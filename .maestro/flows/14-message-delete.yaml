@@ -1,0 +1,27 @@
+# Delete an own message. Long-press the bubble → Delete action →
+# assert the bubble is gone or replaced by a tombstone.
+appId: com.ethora.SDKPlayground
+env:
+  TARGET: "delete-me ${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- tapOn:
+    id: "chat_input"
+- inputText: ${TARGET}
+- tapOn:
+    id: "chat_send_button"
+- extendedWaitUntil:
+    visible: ${TARGET}
+    timeout: 5000
+- longPressOn: ${TARGET}
+- tapOn:
+    text: "Delete"
+    optional: true
+- tapOn:
+    text: "Delete"
+    optional: true
+- extendedWaitUntil:
+    notVisible: ${TARGET}
+    timeout: 5000

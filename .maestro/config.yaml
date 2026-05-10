@@ -1,0 +1,3 @@
+# Maestro project config — applies to every flow under .maestro/flows.
+flows:
+  - flows/*.yaml

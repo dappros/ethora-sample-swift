@@ -1,0 +1,19 @@
+# Send a text message from alice. Verifies the full XMPP send path:
+# resource bind → MUC presence → message stanza → archive ack.
+# Catches: BIND-result match regression, send button gated on wrong
+# status, optimistic UI dropping bubbles on first ack.
+appId: com.ethora.SDKPlayground
+env:
+  TEST_MESSAGE: "maestro hello ${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- tapOn:
+    id: "chat_input"
+- inputText: ${TEST_MESSAGE}
+- tapOn:
+    id: "chat_send_button"
+- extendedWaitUntil:
+    visible: ${TEST_MESSAGE}
+    timeout: 5000

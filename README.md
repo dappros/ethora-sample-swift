@@ -83,3 +83,60 @@ open SDKPlayground.xcodeproj
 
 `SDKPlayground` is configured to use a local Swift Package at `../..` (from `Examples/SDKPlayground` to the root containing `Package.swift`).  
 If your external workspace has a different directory depth, update the local package path in Xcode (or in `project.yml`).
+
+## Testing
+
+This repo hosts the **Layer 2** end-to-end test flows for the Ethora
+iOS SDK. Layer 1 (hermetic XCTest unit tests) lives in
+[`ethora-sdk-swift`](https://github.com/dappros/ethora-sdk-swift#testing)
+alongside the source it exercises.
+
+### What runs here
+
+[`.maestro/`](.maestro/) holds 19 [Maestro](https://maestro.mobile.dev/)
+YAML flows that drive the SDKPlayground app on an iOS Simulator
+against `chat-qa.ethora.com`. The same 19 flow YAMLs (with the
+same numbering and intent) drive the Android sample app on Android
+emulators — see
+[`ethora-sample-android/.maestro/`](https://github.com/dappros/ethora-sample-android/tree/main/.maestro).
+
+They run on the sample's CI ([`.github/workflows/maestro.yml`](.github/workflows/maestro.yml))
+on every push, PR, and SDK release tag — the gate that catches
+integration regressions like config drift, preset URL breakage, or
+cross-platform feature parity gaps.
+
+| # | Flow | Covers |
+|---|------|--------|
+| 01 | login-email | Happy-path email/password login → connected |
+| 02 | login-jwt | Bring-your-own-auth client-flow JWT |
+| 03 | list-rooms | Room list renders post-login with unread counts |
+| 04 | send-text | XMPP send round-trip |
+| 05 | receive-text | MAM delivery from a second user |
+| 06 | attach-file | Upload + image bubble |
+| 07 | reconnect-airplane | Disconnect → reconnect → history survives |
+| 08 | push-deep-link | APNs payload → correct room |
+| 09 | logout-relogin | State isolation across sessions |
+| 10 | switch-app | Multi-tenant app switcher |
+| 11 | login-wrong-password | Negative path surfaces error to UI |
+| 13 | message-edit | Long-press → Edit → bubble updates |
+| 14 | message-delete | Long-press → Delete → tombstone or removal |
+| 15 | message-reaction | Long-press → React → emoji + count visible |
+| 16 | create-room | "+" → name → room visible + writable |
+| 17 | search-rooms | `.searchable` filter narrows + restores list |
+| 18 | multi-message-rapid | 5 rapid sends, ordering preserved |
+| 19 | room-info | Room info modal → participants + leave control |
+| 20 | offline-pending-resend | Send while disconnected → message lands after reconnect |
+
+(Flow 12 reserved for typing-indicator — needs a `sendAsBob`-style
+helper for XMPP composing-state.)
+
+Full coverage table with per-flow assertions and the regression
+classes each catches:
+[`.maestro/README.md`](.maestro/README.md#coverage-table).
+
+### Adding a new flow
+
+Each flow is ~10–30 lines of YAML; copy
+[`flows/01-login-email.yaml`](.maestro/flows/01-login-email.yaml)
+as a template. See [`.maestro/README.md`](.maestro/README.md) for
+authoring conventions and how to run flows locally.

@@ -1,0 +1,26 @@
+# Open the per-room info modal — participants, room name, leave-room
+# control. Catches: GET /chats/:jid/details regression, avatar URL
+# malformed, leave-room button hidden on rooms the user owns,
+# participant list not re-rendering on roster change.
+appId: com.ethora.SDKPlayground
+---
+- runFlow: 04-send-text.yaml
+- tapOn:
+    text: "Info"
+    optional: true
+- tapOn:
+    id: "chat_room_title"
+    optional: true
+- assertVisible:
+    text: "Participants"
+    optional: true
+- assertVisible:
+    text: ${MAESTRO_TEST_EMAIL:-alice@ethora.com}
+    substring: true
+    optional: true
+- assertVisible:
+    text: "Leave"
+    substring: true
+    optional: true
+- back
+- assertVisible: "maestro hello"

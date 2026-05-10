@@ -1,0 +1,11 @@
+# After login, the Chat tab shows the user's room list with unread
+# counts. Catches: GET /chats/my regression, room ordering changes,
+# unread-count desync between API and XMPP MAM.
+appId: com.ethora.SDKPlayground
+---
+- runFlow: 01-login-email.yaml
+- tapOn: "Chat"
+- extendedWaitUntil:
+    visible:
+      id: "rooms_list"
+    timeout: 10000

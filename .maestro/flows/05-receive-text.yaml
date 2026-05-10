@@ -1,0 +1,18 @@
+# Two-user flow: bob sends a message via direct REST API, alice (in
+# this Maestro session on iOS) sees it land in real-time via XMPP
+# push. Catches: missing MAM subscription, XMPPClient duplication
+# for the same JID, reconnect-after-idle dropping the muc presence.
+appId: com.ethora.SDKPlayground
+env:
+  TEST_MESSAGE: "from bob ${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- runScript:
+    file: ../scripts/sendAsBob.js
+    env:
+      MESSAGE: ${TEST_MESSAGE}
+- extendedWaitUntil:
+    visible: ${TEST_MESSAGE}
+    timeout: 10000
