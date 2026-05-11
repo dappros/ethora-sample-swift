@@ -1,0 +1,18 @@
+# Reconnect smoke — drives the SDK's reconnect path via the app's
+# Disconnect / Connect buttons rather than toggling OS-level network
+# state (the simulator's Wi-Fi can be killed via `xcrun simctl
+# privacy` only on certain SDKs; the in-app path is more portable).
+appId: com.ethora.SDKPlayground
+---
+- runFlow: 04-send-text.yaml
+- tapOn: "Setup"
+- tapOn: "Disconnect"
+- extendedWaitUntil:
+    visible: "Disconnected"
+    timeout: 10000
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "Connected"
+    timeout: 30000
+- tapOn: "Chat"
+- assertVisible: "maestro hello"

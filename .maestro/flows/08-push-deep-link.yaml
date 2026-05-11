@@ -1,0 +1,21 @@
+# Push notification → deep-link to the right room. Catches: payload
+# extras not extracted, room JID URL-decoded wrong, navigation fires
+# before the SDK has finished bootstrap.
+#
+# We don't deliver via APNS/FCM here — that needs a real device with
+# entitlements + server-side push. Instead the **CI workflow**
+# synthesises the notification via:
+#
+#     xcrun simctl push booted com.ethora.SDKPlayground push.json
+#
+# where push.json contains the same `notification_jid` payload the
+# SDK reads. The flow then asserts on the resulting state.
+appId: com.ethora.SDKPlayground
+env:
+  TARGET_ROOM_JID: ${MAESTRO_TEST_ROOM_JID}
+---
+- launchApp:
+    clearState: false
+- extendedWaitUntil:
+    visible: ${TARGET_ROOM_JID}
+    timeout: 10000

@@ -1,0 +1,34 @@
+# Disconnect → send (message gets queued or marked send-failed) →
+# reconnect → assert the message either auto-resends or is offered
+# for retry, and ultimately becomes visible.
+appId: com.ethora.SDKPlayground
+env:
+  TARGET: "offline-resend-${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- tapOn: "Setup"
+- tapOn: "Disconnect"
+- extendedWaitUntil:
+    visible: "Disconnected"
+    timeout: 10000
+- tapOn: "Chat"
+- tapOn:
+    id: "chat_input"
+- inputText: ${TARGET}
+- tapOn:
+    id: "chat_send_button"
+- tapOn: "Setup"
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "Connected"
+    timeout: 30000
+- tapOn: "Chat"
+- tapOn:
+    text: "Tap to retry"
+    optional: true
+- extendedWaitUntil:
+    visible: ${TARGET}
+    timeout: 15000
+- assertNotVisible: "Sending failed"

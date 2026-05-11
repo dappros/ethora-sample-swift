@@ -1,0 +1,25 @@
+# Attach + send a file. Catches: PendingMediaSendQueue regressions,
+# upload 401 due to wrong auth header, MIME-type rejection.
+#
+# Prerequisite: the test image must be in the simulator's Photos
+# library. The CI workflow seeds it before this flow runs:
+#
+#     xcrun simctl addmedia booted .maestro/assets/test-image.png
+#
+# For local runs, run the same command once after booting the
+# simulator.
+appId: com.ethora.SDKPlayground
+---
+- runFlow: 04-send-text.yaml
+- tapOn:
+    id: "chat_attach_button"
+- tapOn:
+    text: "Photos"
+    optional: true
+- tapOnFirst:
+    id: "gallery_thumbnail"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "chat_message_image"
+    timeout: 30000

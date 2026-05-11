@@ -1,0 +1,18 @@
+# Full logout → re-login cycle. Catches: persisted state not cleared
+# on logout (next user sees previous user's rooms briefly), CoreData
+# / UserDefaults corruption on second-init, XMPP client leaking
+# across sessions.
+appId: com.ethora.SDKPlayground
+---
+- runFlow: 04-send-text.yaml
+- tapOn: "Setup"
+- tapOn: "Disconnect"
+- extendedWaitUntil:
+    visible: "Disconnected"
+    timeout: 10000
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "Connected"
+    timeout: 15000
+- tapOn: "Chat"
+- assertVisible: "maestro hello"

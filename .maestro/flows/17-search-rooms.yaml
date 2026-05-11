@@ -1,0 +1,25 @@
+# Search the room list. iOS uses SwiftUI's `.searchable` modifier
+# which renders the system-style search bar at the top of the List.
+# Catches: search predicate not running case-insensitive, accent
+# stripping regression, list not re-rendering on query change,
+# "no results" empty-state never appearing.
+appId: com.ethora.SDKPlayground
+env:
+  ROOM_QUERY: ${MAESTRO_TEST_ROOM_QUERY:-Maestro}
+---
+- runFlow: 03-list-rooms.yaml
+# .searchable shows the search bar after a slight downward scroll
+# on iOS; pull the list down a touch to reveal it.
+- swipe:
+    from:
+      id: "rooms_list"
+    direction: DOWN
+- tapOn:
+    text: "Search"
+    optional: true
+- inputText: ${ROOM_QUERY}
+- extendedWaitUntil:
+    visible:
+      text: ${ROOM_QUERY}
+      substring: true
+    timeout: 5000

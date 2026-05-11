@@ -1,0 +1,23 @@
+# JWT (custom) auth mode — host app provides a pre-signed JWT and the
+# SDK posts it to /users/client. Distinct from email login because it
+# exercises JWTLoginConfig + the bring-your-own-auth path.
+appId: com.ethora.SDKPlayground
+env:
+  USER_JWT: ${MAESTRO_TEST_USER_JWT}
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    when:
+      true: ${USER_JWT == null || USER_JWT == ""}
+    commands:
+      - assertVisible: "(skip — no MAESTRO_TEST_USER_JWT set in env)"
+- tapOn: "Setup"
+- tapOn: "JWT"
+- tapOn:
+    text: "JWT token"
+- inputText: ${USER_JWT}
+- tapOn: "Connect"
+- extendedWaitUntil:
+    visible: "Connected"
+    timeout: 15000

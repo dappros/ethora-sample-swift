@@ -1,0 +1,28 @@
+# React to a message with an emoji. Long-press → reaction picker →
+# pick 👍 → assert the reaction appears on the bubble with count 1.
+appId: com.ethora.SDKPlayground
+env:
+  TARGET: "react-to-me ${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- tapOn:
+    id: "chat_input"
+- inputText: ${TARGET}
+- tapOn:
+    id: "chat_send_button"
+- extendedWaitUntil:
+    visible: ${TARGET}
+    timeout: 5000
+- longPressOn: ${TARGET}
+- tapOn:
+    text: "React"
+    optional: true
+- tapOn: "👍"
+- extendedWaitUntil:
+    visible: "👍"
+    timeout: 5000
+- assertVisible:
+    text: "1"
+    substring: true

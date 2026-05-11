@@ -1,0 +1,36 @@
+# Edit an own message after sending. Long-press the bubble → Edit
+# action → ChatInputView switches to edit mode → change text → tap
+# Send → assert the bubble updates in place and an `(edited)`
+# indicator appears.
+appId: com.ethora.SDKPlayground
+env:
+  ORIGINAL: "edit-me ${EPOCH}"
+  EDITED: "edited-${EPOCH}"
+---
+- runFlow: 03-list-rooms.yaml
+- tapOnFirst:
+    id: "room_row"
+- tapOn:
+    id: "chat_input"
+- inputText: ${ORIGINAL}
+- tapOn:
+    id: "chat_send_button"
+- extendedWaitUntil:
+    visible: ${ORIGINAL}
+    timeout: 5000
+- longPressOn: ${ORIGINAL}
+- tapOn:
+    text: "Edit"
+    optional: true
+- eraseText: 200
+- inputText: ${EDITED}
+- tapOn:
+    id: "chat_send_button"
+- extendedWaitUntil:
+    visible: ${EDITED}
+    timeout: 5000
+- assertNotVisible: ${ORIGINAL}
+- assertVisible:
+    text: "edited"
+    substring: true
+    optional: true

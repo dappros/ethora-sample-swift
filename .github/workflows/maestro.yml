@@ -1,0 +1,133 @@
+name: Maestro E2E (iOS)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#
+#   MAESTRO_TEST_EMAIL          alice's email on chat-qa
+#   MAESTRO_TEST_PASSWORD       alice's password
+#   MAESTRO_TEST_USER_JWT       alice's client-flow JWT (02-login-jwt)
+#   MAESTRO_TEST_ROOM_JID       a MUC room JID alice + bob both belong to
+#   MAESTRO_TEST_BOB_JWT        bob's user-session JWT (sendAsBob.js — 05)
+#   MAESTRO_TEST_APPB_*         second-app credentials for 10-switch-app
+#   ETHORA_API_BASE_URL         e.g. https://api.chat-qa.ethora.com/v1
+#   ETHORA_APP_ID               24-char hex
+#   ETHORA_APP_TOKEN            JWT app token
+#
+# All credentials must point at chat-qa, never prod.
+
+jobs:
+  maestro:
+    name: Maestro on iOS Simulator (${{ matrix.os-version }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # PR runs hit one iOS version; release tags hit the matrix.
+        os-version: ${{ github.event_name == 'release' && fromJson('["17.5", "18.0"]') || fromJson('["18.0"]') }}
+        device: ['iPhone 15']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Install xcodegen + Maestro
+        run: |
+          brew install xcodegen
+          curl -fsSL https://get.maestro.mobile.dev | bash
+
+      - name: Generate Xcode project
+        run: ./generate_xcodeproj.sh
+
+      - name: Build SDKPlayground
+        run: |
+          xcodebuild -project SDKPlayground.xcodeproj \
+            -scheme SDKPlayground \
+            -destination 'platform=iOS Simulator,name=${{ matrix.device }},OS=${{ matrix.os-version }}' \
+            -configuration Debug \
+            -derivedDataPath build/ \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Boot simulator + install app
+        run: |
+          xcrun simctl shutdown all || true
+          DEVICE_ID=$(xcrun simctl create maestro-runner \
+            "com.apple.CoreSimulator.SimDeviceType.iPhone-15" \
+            "com.apple.CoreSimulator.SimRuntime.iOS-${{ matrix.os-version }}" || \
+            xcrun simctl list devices "${{ matrix.device }}" | grep -E "${{ matrix.device }} \(" | head -1 | awk -F'[()]' '{print $2}')
+          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl install "$DEVICE_ID" \
+            build/Build/Products/Debug-iphonesimulator/SDKPlayground.app
+
+      - name: Seed test image into Photos library (for flow 06)
+        run: |
+          xcrun simctl addmedia "$DEVICE_ID" .maestro/assets/test-image.png
+
+      - name: Write SDKPlayground default config from secrets
+        # The iOS playground reads its defaults from PlaygroundSession's
+        # @AppStorage. CI sets them by writing the corresponding
+        # UserDefaults entries via simctl. Adjust the keys below if the
+        # app's PlaygroundSession persistence schema changes.
+        run: |
+          xcrun simctl spawn "$DEVICE_ID" defaults write com.ethora.SDKPlayground baseURLString "${{ secrets.ETHORA_API_BASE_URL }}"
+          xcrun simctl spawn "$DEVICE_ID" defaults write com.ethora.SDKPlayground appId "${{ secrets.ETHORA_APP_ID }}"
+          xcrun simctl spawn "$DEVICE_ID" defaults write com.ethora.SDKPlayground appToken "${{ secrets.ETHORA_APP_TOKEN }}"
+
+      - name: Run flows on simulator
+        run: |
+          # Flows 01-07 + 09-20, skipping 08 (push, needs simctl push first).
+          ~/.maestro/bin/maestro test \
+            .maestro/flows/01-login-email.yaml \
+            .maestro/flows/02-login-jwt.yaml \
+            .maestro/flows/03-list-rooms.yaml \
+            .maestro/flows/04-send-text.yaml \
+            .maestro/flows/05-receive-text.yaml \
+            .maestro/flows/06-attach-file.yaml \
+            .maestro/flows/07-reconnect-airplane.yaml \
+            .maestro/flows/09-logout-relogin.yaml \
+            .maestro/flows/10-switch-app.yaml \
+            .maestro/flows/11-login-wrong-password.yaml \
+            .maestro/flows/13-message-edit.yaml \
+            .maestro/flows/14-message-delete.yaml \
+            .maestro/flows/15-message-reaction.yaml \
+            .maestro/flows/16-create-room.yaml \
+            .maestro/flows/17-search-rooms.yaml \
+            .maestro/flows/18-multi-message-rapid.yaml \
+            .maestro/flows/19-room-info.yaml \
+            .maestro/flows/20-offline-pending-resend.yaml
+
+          # Flow 08: deliver synthetic push, then run the deep-link
+          # assertion flow.
+          bash .maestro/scripts/sendPushIntent.sh "${MAESTRO_TEST_ROOM_JID}"
+          ~/.maestro/bin/maestro test .maestro/flows/08-push-deep-link.yaml
+        env:
+          MAESTRO_TEST_EMAIL: ${{ secrets.MAESTRO_TEST_EMAIL }}
+          MAESTRO_TEST_PASSWORD: ${{ secrets.MAESTRO_TEST_PASSWORD }}
+          MAESTRO_TEST_USER_JWT: ${{ secrets.MAESTRO_TEST_USER_JWT }}
+          MAESTRO_TEST_ROOM_JID: ${{ secrets.MAESTRO_TEST_ROOM_JID }}
+          MAESTRO_TEST_APPB_BASE_URL: ${{ secrets.MAESTRO_TEST_APPB_BASE_URL }}
+          MAESTRO_TEST_APPB_APP_ID: ${{ secrets.MAESTRO_TEST_APPB_APP_ID }}
+          MAESTRO_TEST_APPB_APP_TOKEN: ${{ secrets.MAESTRO_TEST_APPB_APP_TOKEN }}
+          MAESTRO_TEST_APPB_EMAIL: ${{ secrets.MAESTRO_TEST_APPB_EMAIL }}
+          MAESTRO_TEST_APPB_PASSWORD: ${{ secrets.MAESTRO_TEST_APPB_PASSWORD }}
+          MAESTRO_API_BASE_URL: ${{ secrets.ETHORA_API_BASE_URL }}
+          MAESTRO_APP_TOKEN: ${{ secrets.ETHORA_APP_TOKEN }}
+          MAESTRO_TEST_BOB_JWT: ${{ secrets.MAESTRO_TEST_BOB_JWT }}
+
+      - name: Upload Maestro recordings on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-recordings-ios-${{ matrix.os-version }}
+          path: ~/.maestro/tests/**
+          retention-days: 14
