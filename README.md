@@ -1,35 +1,35 @@
 # SDK Playground
 
-An interactive iOS app **inside the SDK repository** for quickly validating `XMPPChatCore` + `XMPPChatUI`: environment setup (Base URL, app token, XMPP), auth via **JWT** (`/users/client`) or **email/password** (`/users/login-with-email`), then chat and a **Logs** tab (XMPP events from `NotificationCenter`).
+An interactive iOS app **inside the SDK repository** for quickly exercising `XMPPChatCore` + `XMPPChatUI`: enter the environment (Base URL, app token, XMPP), sign in via **JWT** (`/users/client`) or **email/password** (`/users/login-with-email`), then use the chat and the **Logs** tab (XMPP events from `NotificationCenter`).
 
-> The name **SDKPlayground** is intentionally not `Testing` to avoid confusion with unit/UI tests.
+> The name **SDKPlayground** is intentionally not `Testing` to avoid confusion with unit / UI tests.
 
 ## Build
 
-From `Examples/SDKPlayground`:
+From the `Examples/SDKPlayground` directory:
 
 ```bash
 ./generate_xcodeproj.sh
 open SDKPlayground.xcodeproj
 ```
 
-**Important:** do not run only `xcodegen generate` without the next step. XcodeGen alone does not fully link the local SPM package, and Xcode may show *Missing package product 'XMPPChatCore' / 'XMPPChatUI'*. The `generate_xcodeproj.sh` script runs `xcodegen` and then `fix_local_package_refs.py`.
+**Important:** do not run `xcodegen generate` on its own — XcodeGen doesn't wire the local SPM `package` link, and Xcode then reports *Missing package product 'XMPPChatCore' / 'XMPPChatUI'*. The `generate_xcodeproj.sh` script runs `xcodegen` and then `fix_local_package_refs.py` to patch that reference.
 
-Select the **SDKPlayground** scheme and a simulator. The local package is connected with `path: ../..` (the `ethora-sdk-swift` root).
+Pick the **SDKPlayground** scheme and a simulator. The local package is wired in as `path: ../..` (the `ethora-sdk-swift` repo root).
 
-The project **must** be opened from `ethora-sdk-swift/Examples/SDKPlayground/`. If you copy only the `SDKPlayground` folder into another repo without the package root, the relative `../..` path to `Package.swift` will break. In that case, update the local package path in Xcode.
+The project **must** be opened from `ethora-sdk-swift/Examples/SDKPlayground/`. If you copy only the `SDKPlayground` folder into a different repository without the package root, the relative `../..` path to `Package.swift` breaks — fix the local-package path in Xcode in that case.
 
 ## Tabs
 
 | Tab | Purpose |
-|--------|------------|
-| **Setup** | API/XMPP parameters, auth mode, **Connect** / **Disconnect** |
-| **Chat** | `ChatWrapperView` after successful Connect |
-| **Logs** | Event stream (including `XMPPConnectionStatusChanged`, `XMPPClientDidConnect`, etc.) |
+|-----|---------|
+| **Setup** | API and XMPP settings, auth mode, **Connect** / **Disconnect** |
+| **Chat** | `ChatWrapperView` after a successful Connect |
+| **Logs** | Event stream (incl. `XMPPConnectionStatusChanged`, `XMPPClientDidConnect`, …) |
 
-The form is persisted in `UserDefaults` (including password, for local debugging only).
+The form is persisted to `UserDefaults` (including the password — local-debugging convenience only).
 
-## Regenerate Project
+## Regenerating the project
 
 After editing `project.yml`:
 

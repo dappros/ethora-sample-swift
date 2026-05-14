@@ -11,6 +11,7 @@
 		41C940C6B410126BA79248E6 /* ChatTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B4323469D2FC9328A1F130 /* ChatTabView.swift */; };
 		698E851CC42D2F6F96213AA1 /* SDKPlaygroundApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA4C081E06046EA50DE92AA /* SDKPlaygroundApp.swift */; };
 		8D3563DB6A83603FB010E601 /* PlaygroundLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA7A0D51350B601930B42E5 /* PlaygroundLogStore.swift */; };
+		8DEBEA92FA829E0048C6FA8F /* HeadlessTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 640F8BE9EF3004BED9C9F578 /* HeadlessTabView.swift */; };
 		B9D39F62D7E84A6569E059A8 /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2482EC964F742E55E474F2 /* LogsView.swift */; };
 		BA421AFC77DFFDF1F59D52EC /* XMPPChatCore in Frameworks */ = {isa = PBXBuildFile; productRef = A36DE92AA356E20C4D88356D /* XMPPChatCore */; };
 		E1E792E6138C4411330E295E /* XMPPChatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9D12BBEBC9DA166EE855C52C /* XMPPChatUI */; };
@@ -21,8 +22,9 @@
 /* Begin PBXFileReference section */
 		15191C678EFFFADF50F32592 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
 		2AE2AE47B74A4947D2BAEE96 /* PlaygroundSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundSession.swift; sourceTree = "<group>"; };
+		640F8BE9EF3004BED9C9F578 /* HeadlessTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessTabView.swift; sourceTree = "<group>"; };
 		7D13257F719AA6AD67EC8292 /* ethora-sdk-swift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "ethora-sdk-swift"; path = ../..; sourceTree = SOURCE_ROOT; };
-		8233DF5BCF0E7C9CCC51CF7C /* SDKPlayground.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SDKPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8233DF5BCF0E7C9CCC51CF7C /* SDKPlayground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDKPlayground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEA4C081E06046EA50DE92AA /* SDKPlaygroundApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKPlaygroundApp.swift; sourceTree = "<group>"; };
 		D5B4323469D2FC9328A1F130 /* ChatTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTabView.swift; sourceTree = "<group>"; };
 		DA2482EC964F742E55E474F2 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				D5B4323469D2FC9328A1F130 /* ChatTabView.swift */,
+				640F8BE9EF3004BED9C9F578 /* HeadlessTabView.swift */,
 				DA2482EC964F742E55E474F2 /* LogsView.swift */,
 				FCA7A0D51350B601930B42E5 /* PlaygroundLogStore.swift */,
 				2AE2AE47B74A4947D2BAEE96 /* PlaygroundSession.swift */,
@@ -113,8 +116,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = AC4708552905A3EA4BC4DB70 /* Build configuration list for PBXProject "SDKPlayground" */;
 			developmentRegion = en;
@@ -144,6 +145,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				41C940C6B410126BA79248E6 /* ChatTabView.swift in Sources */,
+				8DEBEA92FA829E0048C6FA8F /* HeadlessTabView.swift in Sources */,
 				B9D39F62D7E84A6569E059A8 /* LogsView.swift in Sources */,
 				8D3563DB6A83603FB010E601 /* PlaygroundLogStore.swift in Sources */,
 				40EE087B267C93D3D5D404CA /* PlaygroundSession.swift in Sources */,
@@ -161,7 +163,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 822G3N7CA5;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs camera access so you can take photos and videos to share in chat.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs microphone access so you can record audio messages and videos with sound.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs photo library access so you can save received media to your photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs photo library access so you can pick existing photos and videos to share in chat.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -182,7 +189,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 822G3N7CA5;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs camera access so you can take photos and videos to share in chat.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs microphone access so you can record audio messages and videos with sound.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs photo library access so you can save received media to your photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs photo library access so you can pick existing photos and videos to share in chat.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

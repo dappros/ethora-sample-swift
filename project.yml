@@ -20,6 +20,13 @@ targets:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        # Privacy usage descriptions. Without these iOS hard-terminates
+        # the app the moment the SDK opens the camera / photo picker /
+        # mic (see FigCaptureSourceRemote __abort_with_payload crash).
+        INFOPLIST_KEY_NSCameraUsageDescription: This app needs camera access so you can take photos and videos to share in chat.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: This app needs microphone access so you can record audio messages and videos with sound.
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: This app needs photo library access so you can pick existing photos and videos to share in chat.
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: This app needs photo library access so you can save received media to your photos.
         SWIFT_VERSION: 5.9
     dependencies:
       - package: EthoraSDK

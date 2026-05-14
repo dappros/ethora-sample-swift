@@ -20,6 +20,11 @@ struct RootTabView: View {
                     Label("Chat", systemImage: "bubble.left.and.bubble.right.fill")
                 }
 
+            HeadlessTabView()
+                .tabItem {
+                    Label("Headless", systemImage: "bell.badge.fill")
+                }
+
             LogsView()
                 .tabItem {
                     Label("Logs", systemImage: "doc.text.fill")
